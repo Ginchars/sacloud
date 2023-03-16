@@ -1,5 +1,5 @@
 {
-  "name": "vutils",
+  "name": "sacloud-cli",
   "version": "1.0.0",
   "description": "A CLI for everyday usage",
   "main": "index.js",
@@ -15,9 +15,10 @@
     "chalk": "^4.1.0",
     "commander": "^7.2.0",
     "conf": "^9.0.2",
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.8.5",
+    "yesno":"^0.4.0"
   },
   "bin": {
-    "vutils": "index.js"
+    "sacloud": "index.js"
   }
 }
