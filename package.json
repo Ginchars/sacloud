@@ -1,0 +1,23 @@
+{
+  "name": "vutils",
+  "version": "1.0.0",
+  "description": "A CLI for everyday usage",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "MIT"
+  ],
+  "author": "Gints Stikans",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "commander": "^7.2.0",
+    "conf": "^9.0.2",
+    "shelljs": "^0.8.5"
+  },
+  "bin": {
+    "vutils": "index.js"
+  }
+}
