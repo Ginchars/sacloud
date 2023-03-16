@@ -54,9 +54,9 @@ const sshProjectPods = (projectName, options) => {
 const _sshInPod = (projectName, pod) => {
     //kubectl exec --namespace $1 --cluster $CLUSTER -it ${project_pods[i]} -- /bin/bash
     let baseCommand = `gnome-terminal --tab -- /bin/bash -c`
-    let command = `${baseCommand} "kubectl exec --namespace ${projectName} --cluster ${_cluster} -it ${pod} -- /bin/bash clear;"`
+    let command = `${baseCommand} "kubectl exec --namespace ${projectName} --cluster ${_cluster} -it ${pod} -- /bin/bash"`
 
-    shell.exec(command, {async: false, silent: false})
+    shell.exec(command, {async: true, silent: true})
 }
 
 module.exports = {
