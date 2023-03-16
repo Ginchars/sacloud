@@ -3,6 +3,7 @@ const { program } = require('commander')
 const { dbpass, createDbDump } = require('./commands/db')
 const { projectPods, sshProjectPods } = require('./commands/pods')
 const { executeCliCommand } = require('./commands/mcli')
+const { projectBuild } = require('./commands/jenkins')
 
 process.on('SIGINT', function() {
         process.exit();
@@ -40,5 +41,11 @@ program
     .option('-c, --command <command>', 'Magento CLI command')
     .description('Execute Magento CLI command on project cron pod')
     .action(executeCliCommand);
+
+program
+    .command('build')
+    .arguments('<projectName> <branch>')
+    .description('Execute project build')
+    .action(projectBuild);
 
 program.parse()
