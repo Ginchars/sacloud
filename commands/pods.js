@@ -20,7 +20,7 @@ const projectPods = (projectName, options) => {
 }
 
 const getProjectPodList = (projectName, type) => {
-    let command = `kubectl get pods --namespace ${projectName} --context ${_cluster} -o=jsonpath="{range .items[*]}{.metadata.name}{"\\n"}{end}`
+    let command = `kubectl get pods --namespace ${projectName} --context ${_cluster} -o=jsonpath='{range .items[*]}{.metadata.name}{"\\n"}{end}'`
 
     if (type !== "") {
         command += ` | grep ${type}`
