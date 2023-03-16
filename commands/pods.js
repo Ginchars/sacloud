@@ -56,3 +56,9 @@ const _sshInPod = (projectName, pod) => {
 
     shell.exec(command, {async: false, silent: false})
 }
+
+module.export = {
+    projectPods,
+    getProjectPodList,
+    sshProjectPods
+}
