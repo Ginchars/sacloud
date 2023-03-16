@@ -20,7 +20,7 @@ const projectPods = (projectName, options) => {
 }
 
 const getProjectPodList = (projectName, type) => {
-    let command = `kubectl get pods --namespace ${projectName} --context ${_cluster}`
+    let command = `kubectl get pods --namespace ${projectName} --context ${_cluster} -o=jsonpath="{range .items[*]}{.metadata.name}{"\\n"}{end}`
 
     if (type !== "") {
         command += ` | grep ${type}`
@@ -43,8 +43,10 @@ const sshProjectPods = (projectName, options) => {
         podList = podList.split(/\r?\n/)
 
         podList.forEach(pod => {
-            console.log(chalk.greenBright('Opening tab for:'), pod)
-            _sshInPod(projectName, pod)
+            if (pod !== "") {
+                console.log(chalk.greenBright('Opening tab for:'), pod)
+                _sshInPod(projectName, pod)
+            }
         });
     }
 }
@@ -57,7 +59,7 @@ const _sshInPod = (projectName, pod) => {
     shell.exec(command, {async: false, silent: false})
 }
 
-module.export = {
+module.exports = {
     projectPods,
     getProjectPodList,
     sshProjectPods
