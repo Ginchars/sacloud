@@ -2,7 +2,7 @@ const shell = require('shelljs')
 const chalk = require('chalk')
 const { readConfigFile, readAndValidateConfig, _configExists } = require('../utils/config')
 const yesno = require('yesno')
-const jenkins = require('node-jenkins-api')
+const https = require('https')
 
 const jenkinsUrl = 'https://ci.vaimo.com/'
 
@@ -13,13 +13,39 @@ const projectBuild = async (projectName, branch) => {
 
     let configData = await readAndValidateConfig()
 
-    if (typeof configData.email !== "undefined" || typeof configData.token !== "undefined") {
-        let jenkinsApi = jenkins.init(jenkinsUrl, {token: 'Z2ludHMuc3Rpa2Fuc0B2YWltby5jb206MTEyZWQ4MzA5MmYwNTBmOTZlYTQxMWQwMTUzZmU5ZGJkZA=='})
+    if (typeof configData.token !== "undefined") {
 
-        jenkinsApi.last_build_info(projectName, {}, function (err, data) {
-            if (err){ return console.log(err); }
-            console.log(data)
-        })
+        // const jr = https.request({
+        //     hostname: jenkinsUrl,
+        //     path: `/job/project_${projectName}/buildWithParameters?BRANCH=${branch}`,
+        //     headers: {
+        //         Authorization: `Basic ${configData.token}`
+        //     }
+        // }, jres => {
+        //     jres.on(data, chunk => {})
+        // })
+        // jr.write();
+        https.get('https://jsonplaceholder.typicode.com/users', res => {
+  let data = [];
+  const headerDate = res.headers && res.headers.date ? res.headers.date : 'no response date';
+  console.log('Status Code:', res.statusCode);
+  console.log('Date in Response header:', headerDate);
+
+  res.on('data', chunk => {
+    data.push(chunk);
+  });
+
+  res.on('end', () => {
+    console.log('Response ended: ');
+    const users = JSON.parse(Buffer.concat(data).toString());
+
+    for(user of users) {
+      console.log(`Got user with id: ${user.id}, name: ${user.name}`);
+    }
+  });
+}).on('error', err => {
+  console.log('Error: ', err.message);
+});
     }
 }
 

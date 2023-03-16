@@ -30,8 +30,7 @@ const readAndValidateConfig = () => {
         prompt.start();
         prompt.get(['email','token'], function (err, result) {
             let configData = {
-                'email': `${result.email}`,
-                'token': `${result.token}`
+                'token': base64.encode(`${result.email}:${result.token}`)
             }
             return writeConfigFile(JSON.stringify(configData))
         });
