@@ -5,13 +5,9 @@ const { generateDBDumpCommand } = require('../utils/db-dump')
 const yesno = require('yesno')
 const fs = require('fs')
 
-let _dbPass = ''
-let _dbPodName = ''
 let _cluster = clusterFromInput()
-let _noFile, _downloadFile = false;
-let _localFilePath = '';
-let _fullDump = false;
-let _newDump = false;
+let _dbPass, _dbPodName, _localFilePath = ''
+let _fullDump, _newDump, _verbose, _noFile, _downloadFile = false;
 
 /*
     DUMP PROJECT DB
@@ -87,6 +83,11 @@ const _createExternalDump = (projectName) => {
     let dumpDbCommand = `${baseCommand} -- /bin/bash -c "${mysqlDump}"`
     let gzipFileCommand = `${baseCommand} -- /bin/bash -c "${gzipFile}"`
 
+    if (_verbose) {
+        console.log(dumpDbCommand)
+        console.log(gzipFileCommand)
+    }
+
     let dumpOutcome = shell.exec(dumpDbCommand, {async: false, silent: true}).stdout
     let gzipOutcome = shell.exec(gzipFileCommand, {async: false, silent: true}).stdout  
 }
@@ -122,6 +123,10 @@ const _isValidFileAge = (projectName) => {
 
 const _removeOldDump = (projectName) => {
     let command = `kubectl exec --context ${_cluster} --namespace ${projectName} -it ${_dbPodName} -- /bin/bash -c "rm -rf /tmp/${projectName}.sql.gz"`
+
+    if (_verbose) {
+        console.log(command)
+    }
 
     shell.exec(command, {async: false, silent: true})
 }

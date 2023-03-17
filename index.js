@@ -21,6 +21,7 @@ program
     .arguments('<projectName>')
     .option('-f, --full-dump', 'Do full DB dump')
     .option('-n, --new-dump', 'Create a new dump file even if there is one')
+    .option('-v, --verbose', 'Verbose - will print kube commands executed')
     .usage(`${chalk.green('<projectName>')} [options -f|--full-dump -n|--new-dump]`)
     .combineFlagAndOptionalValue(true)
     .description('Get DB Dump')
@@ -30,6 +31,7 @@ program
     .command('pod-list')
     .arguments('<projectName>')
     .option('-t, --type <type>', 'Get Specific Pods')
+    .option('-v, --verbose', 'Verbose - will print kube commands executed')
     .usage(`${chalk.green('<projectName>')} [options -t|--type <type>]`)
     .description('Get Project Pod List')
     .action(projectPods);
@@ -38,6 +40,7 @@ program
     .command('ssh-pods')
     .arguments('<projectName>')
     .option('-t, --type <type>', 'SSH In specific project pods', 'web')
+    .option('-v, --verbose', 'Verbose - will print kube commands executed')
     .usage(`${chalk.green('<projectName>')} [options -t|--type <type>|default:web]`)
     .description('SSH in projects pods - defaults to web')
     .action(sshProjectPods);

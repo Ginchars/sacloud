@@ -2,6 +2,7 @@ const shell = require('shelljs')
 const chalk = require('chalk');
 const { clusterFromInput } = require('../utils/cluster');
 const _cluster = clusterFromInput()
+const _verbose = false;
 
 /*
     GET PROJECT PODS
@@ -9,6 +10,7 @@ const _cluster = clusterFromInput()
 const projectPods = (projectName, options) => {
     let message = `Fetching pod list for ${projectName}`
     let type = ''
+    _verbose = (typeof options.verbose !== "undefined")
 
     if (typeof options.type !== "undefined") {
         message += ` type: ${options.type}`
@@ -24,6 +26,10 @@ const getProjectPodList = (projectName, type) => {
 
     if (type !== "") {
         command += ` | grep ${type}`
+    }
+
+    if (_verbose) {
+        console.log(command)
     }
 
     let output = shell.exec(command, {async: false, silent: true}).stdout
@@ -55,6 +61,10 @@ const _sshInPod = (projectName, pod) => {
     //kubectl exec --namespace $1 --cluster $CLUSTER -it ${project_pods[i]} -- /bin/bash
     let baseCommand = `gnome-terminal --tab -- /bin/bash -c`
     let command = `${baseCommand} "kubectl exec --namespace ${projectName} --cluster ${_cluster} -it ${pod} -- /bin/bash"`
+
+    if (_verbose) {
+        console.log(command)
+    }
 
     shell.exec(command, {async: true, silent: true})
 }
