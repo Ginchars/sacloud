@@ -2,7 +2,7 @@
 const { program } = require('commander')
 const chalk = require('chalk')
 const { dbpass, createDbDump } = require('./commands/db')
-const { projectPods, sshProjectPods } = require('./commands/pods')
+const { projectPods, sshProjectPods, getProjectPodInfo } = require('./commands/pods')
 const { executeCliCommand } = require('./commands/mcli')
 
 process.on('SIGINT', function() {
@@ -35,6 +35,12 @@ program
     .usage(`${chalk.green('<projectName>')} [options -t|--type <type>]`)
     .description('Get Project Pod List')
     .action(projectPods);
+
+program
+    .command('cb')
+    .arguments('<projectName>')
+    .description('Fetch latest deployed build number')
+    .action(getProjectPodInfo);
 
 program
     .command('ssh-pods')

@@ -37,6 +37,24 @@ const getProjectPodList = (projectName, type) => {
     return output
 }
 
+const getProjectPodInfo = (projectName) => {
+    console.log(chalk.greenBright(`Fetching pod information (current deployed build)`));
+    let cronPodName = getProjectPodList(projectName, 'cron').trim();
+    let imageInfo = ':'
+
+    if (cronPodName !== "") {
+        let command = `kubectl get pods ${cronPodName} --context ${_cluster} -n ${projectName} -o=jsonpath='{.spec.containers[0].image}'`
+        imageInfo = shell.exec(command, {async: false, silent: true}).stdout
+    }
+
+    if (typeof imageInfo !== "undefined" && imageInfo !== "") {
+        imageInfo = imageInfo.split(":")
+    }
+
+    console.log(chalk.greenBright(`Project and environment: `), projectName)
+    console.log(chalk.greenBright('Current build:'), imageInfo[1])
+}
+
 /*
     SSH IN PODS
 */
@@ -73,5 +91,6 @@ const _sshInPod = (projectName, pod) => {
 module.exports = {
     projectPods,
     getProjectPodList,
-    sshProjectPods
+    sshProjectPods,
+    getProjectPodInfo
 }
