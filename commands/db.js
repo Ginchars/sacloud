@@ -6,8 +6,8 @@ const yesno = require('yesno')
 const fs = require('fs')
 
 let _cluster = clusterFromInput()
-let _dbPass, _dbPodName, _localFilePath = ''
-let _fullDump, _newDump, _verbose, _noFile, _downloadFile = false;
+let _dbPass = '', _dbPodName = '', _localFilePath = ''
+let _fullDump = false, _newDump = false, _verbose = false, _noFile = false, _downloadFile = false;
 
 /*
     DUMP PROJECT DB
@@ -103,6 +103,7 @@ const _initDbDump = (projectName, options) => {
 
     _fullDump = (typeof options.fullDump !== "undefined")
     _newDump = (typeof options.newDump !== "undefined")
+    _verbose = (typeof options.verbose !== "undefined")
 }
 
 const _isValidFileAge = (projectName) => {
