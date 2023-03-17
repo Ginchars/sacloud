@@ -53,4 +53,6 @@ program
     .description('Execute Magento CLI command on project cron pod')
     .action(executeCliCommand);
 
-program.parse()
+program
+    .usage('Example usage for commands\n1. sacloud db-pass jdgroup-m23-stg => gives projects DB pass\n2. sacloud db-dump jdgroup-m23-stg [--full-dump|--new-dump] => Creates and downloads projects DB\n3. sacloud pod-list jdgroup-m23-stg [-t|--type] => Returns list of all or filtered pods for project\n4. sacloud ssh-pods jdgroup-m23-stg [-t|--type] => SSH in to pod(s)\n5. sacloud m-cli jdgroup-m23-stg -c|--command indexer:status => Returns magneto cli output')
+    .parse()
