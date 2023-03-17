@@ -1,0 +1,33 @@
+/*
+    PREPARE DB DUMP QUERIES
+*/
+
+const lock_params = '--single-transaction --set-gtid-purged=OFF --skip-opt --create-options --disable-keys --extended-insert --set-charset --quick'
+const ignore_tables = ['core_cache','importexport_importdata','dataflow_batch','dataflow_batch_export','dataflow_batch_import','dataflow_import_data','enterprise_logging_event','enterprise_logging_event_changes','index_process_event','index_event','log_customer','log_quote','log_summary','log_url','log_url_info','log_visitor','log_visitor_info','log_visitor_online','report_event','report_viewed_product_index','vaimo_directsoap_message','vaimo_directsoap_message_record','icommerce_scheduler_history','ic_cache_clean_tags','ic_cache_clean_occasion','ic_cache_clean_history','cron_schedule','catalog_category_flat_cl','catalog_category_product_cl','catalog_category_product_cat_cl','catalog_category_product_index_cl','catalog_product_flat_cl','catalog_product_attribute_cl','catalog_product_category_cl','catalog_product_price_cl','catalog_product_index_price_cl','cataloginventory_stock_cl','cataloginventory_stock_status_cl','catalogsearch_fulltext_cl','catalogrule_product_cl','catalogrule_rule_cl','salesrule_rule_cl','targetrule_rule_product_cl','targetrule_product_rule_cl','catalogsearch_fulltext_cl','enterprise_url_rewrite_category_cl','enterprise_url_rewrite_product_cl','enterprise_url_rewrite_redirect_cl','nosto_product_sync_cl','vaimo_badges_product_cl','vaimo_badges_badge_cl','amasty_feed_entity_cl','amasty_feed_product_cl','elasticsuite_thesaurus_cl','elasticsuite_categories_fulltext_cl','vaimo_integration_base_attribute','vaimo_integration_base_creditmemo','vaimo_integration_base_creditmemo_item','vaimo_integration_base_file','vaimo_integration_base_invoice','vaimo_integration_base_invoice_comment','vaimo_integration_base_invoice_item','vaimo_integration_base_link','vaimo_integration_base_price','vaimo_integration_base_process','vaimo_integration_base_product','vaimo_integration_base_queue','vaimo_integration_base_shipment','vaimo_integration_base_shipment_item','vaimo_integration_base_shipment_track','vaimo_integration_base_stock','ib_export_history','ib_export_queue','ib_import_history','ib_import_queue','ib_state','ib_log','ib_lock','sales_order_aggregated_created','sales_order_aggregated_updated','sales_order_tax','sales_order_tax_item','sales_flat_creditmemo','sales_flat_creditmemo_comment','sales_flat_creditmemo_grid','sales_flat_creditmemo_item','sales_flat_invoice','sales_flat_invoice_comment','sales_flat_invoice_grid','sales_flat_invoice_item','sales_flat_order','sales_flat_order_address','sales_flat_order_grid','sales_flat_order_item','sales_flat_order_payment','sales_flat_order_status_history','sales_flat_quote','sales_flat_quote_address','sales_flat_quote_address_item','sales_flat_quote_item','sales_flat_quote_item_option','sales_flat_quote_payment','sales_flat_quote_shipping_rate','sales_flat_shipment','sales_flat_shipment_comment','sales_flat_shipment_grid','sales_flat_shipment_item','sales_flat_shipment_track','sales_recurring_profile','sales_recurring_profile_order','sales_refunded_aggregated','sales_refunded_aggregated_order','sales_payment_transaction','enterprise_sales_creditmemo_grid_archive','enterprise_sales_invoice_grid_archive','enterprise_sales_order_grid_archive','enterprise_sales_shipment_grid_archive','enterprise_customer_sales_flat_order','enterprise_customer_sales_flat_order_address','enterprise_customer_sales_flat_quote','enterprise_customer_sales_flat_quote_address','sales_bestsellers_aggregated_daily','sales_bestsellers_aggregated_monthly','sales_bestsellers_aggregated_yearly','salesrule_coupon_usage','salesrule_customer','sales_creditmemo','sales_creditmemo_comment','sales_creditmemo_grid','sales_creditmemo_item','sales_invoice','sales_invoice_comment','sales_invoice_grid','sales_invoice_item','sales_invoiced_aggregated','sales_invoiced_aggregated_order','sales_order','sales_order_address','sales_order_grid','sales_order_item','sales_order_payment','sales_order_status_history','sales_shipment','sales_shipment_comment','sales_shipment_grid','sales_shipment_item','sales_shipment_track','customer_address_entity','customer_address_entity_datetime','customer_address_entity_decimal','customer_address_entity_int','customer_address_entity_text','customer_address_entity_varchar','customer_entity','customer_entity_datetime','customer_entity_decimal','customer_entity_int','customer_entity_text','customer_entity_varchar','wishlist','wishlist_item','wishlist_item_option','newsletter_subscriber','customer_log','customer_visitor','customer_grid_flat','quote','quote_address','quote_address_item','quote_id_mask','quote_item','quote_item_option','quote_payment','quote_preview','quote_shipping_rate','product_alert_stock','product_alert_price','product_alert_extended_stock','company','company_advanced_customer_entity','company_credit','company_credit_history','company_order_entity','company_payment','company_permissions','company_roles','company_structure','company_team','company_user_roles','negotiable_quote','negotiable_quote_comment','negotiable_quote_comment_attachment','negotiable_quote_company_config','negotiable_quote_grid','negotiable_quote_history','negotiable_quote_item','negotiable_quote_purged_content','requisition_list','requisition_list_item','gdpr_customer_activity','gdpr_integration_activity','gdpr_request','gdpr_request_item','vaimo_gdpr_privacy_policy','mageplaza_smtp_log','vaimo_jdgroupintegrations_masterdatalog','vaimo_qconnector_import_logs','vaimo_akeneorabbitmq_images','vaimo_akeneorabbitmq_importlog']
+
+
+const generateDBDumpCommand = (projectName, dbPass, fullDB) => {
+    let dumpFile = `/tmp/${projectName}.sql`
+    let fullDumpcCommand = `mysqldump ${lock_params} -umoco-admin -p${dbPass} magento > ${dumpFile}`
+
+    if (fullDB) {
+        return fullDumpcCommand
+    } else {
+        let dumpCommand, ignoreTables = ''
+        let authParams = `-umoco-admin -p${dbPass}`
+
+        ignore_tables.forEach(table => {
+            ignoreTables += ` --ignore-table=magento.${table}`
+        });
+
+        dumpCommand = `mysqldump --triggers=FALSE --no-data ${authParams} ${lock_params} magento > ${dumpFile}; `
+        dumpCommand += `mysqldump --no-create-info --triggers=FALSE ${authParams} ${lock_params} ${ignoreTables} magento >> ${dumpFile}; `
+        dumpCommand += `mysqldump --routines --no-create-info --no-data --no-create-db --skip-opt --set-gtid-purged=OFF ${authParams} magento >> ${dumpFile}`
+
+        return dumpCommand
+    }
+}
+
+module.exports = {
+    generateDBDumpCommand
+}
