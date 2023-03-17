@@ -17,6 +17,8 @@ program
 program
     .command('db-dump')
     .arguments('<projectName>')
+    .option('-f, --full-dump', 'Do full DB dump')
+    .option('-n, --new-dump', 'Create a new dump file even if there is one')
     .description('Get DB Dump')
     .action(createDbDump);
 

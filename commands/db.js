@@ -1,28 +1,31 @@
 const shell = require('shelljs')
-const chalk = require('chalk');
-const { clusterFromInput } = require('../utils/cluster');
+const chalk = require('chalk')
+const { clusterFromInput } = require('../utils/cluster')
+const { generateDBDumpCommand } = require('../utils/db-dump')
 const yesno = require('yesno')
 const fs = require('fs')
 
 let _dbPass = ''
 let _dbPodName = ''
 let _cluster = clusterFromInput()
-let _noFile = _downloadFile = false;
+let _noFile, _downloadFile = false;
 let _localFilePath = '';
+let _fullDump = false;
+let _newDump = false;
 
 /*
     DUMP PROJECT DB
 */
-const createDbDump = async (projectName) => {
+const createDbDump = async (projectName, options) => {
     _localFilePath = `${process.cwd()}/${projectName}.sql`
     const doDump = await yesno({question: `Do you want to download DB dump for project: ${projectName} [y/yes, n/no]:`})
 
     if (doDump) {
         console.log(chalk.greenBright(`Starting DB Dump Process (Project: ${projectName})`))
         // Init params
-        _initDbDump(projectName)
+        _initDbDump(projectName, options)
 
-        if (_isValidFileAge(projectName) === false) {
+        if (!_isValidFileAge(projectName) || _newDump) {
             console.log(chalk.redBright('0. Removing outdated external dump'))
             _removeOldDump(projectName)
             _noFile = true;
@@ -55,7 +58,7 @@ const createDbDump = async (projectName) => {
 }
 
 const _downloadExternalDump = (projectName) => {
-    let dwnCommand = `kubectl --context ${_cluster} -n ${projectName} cp ${_dbPodName}:/tmp/${projectName}.sql.gz "${_localFilePath}.gz" --retries=100`
+    let dwnCommand = `kubectl --context ${_cluster} -n ${projectName} cp ${_dbPodName}:/tmp/${projectName}.sql.gz "${_localFilePath}.gz" --retries=200`
 
     shell.exec(dwnCommand, {async: false, silent: true})
 }
@@ -79,7 +82,7 @@ const _extractAndFixFile = () => {
 
 const _createExternalDump = (projectName) => {
     let baseCommand = `kubectl exec --context ${_cluster} --namespace ${projectName} -it ${_dbPodName}`
-    let mysqlDump = `mysqldump --single-transaction --set-gtid-purged=OFF -umoco-admin -p${_dbPass} magento > /tmp/${projectName}.sql`
+    let mysqlDump = generateDBDumpCommand(projectName, _dbPass, _fullDump)
     let gzipFile = `gzip /tmp/${projectName}.sql`
     let dumpDbCommand = `${baseCommand} -- /bin/bash -c "${mysqlDump}"`
     let gzipFileCommand = `${baseCommand} -- /bin/bash -c "${gzipFile}"`
@@ -88,7 +91,7 @@ const _createExternalDump = (projectName) => {
     let gzipOutcome = shell.exec(gzipFileCommand, {async: false, silent: true}).stdout  
 }
 
-const _initDbDump = (projectName) => {
+const _initDbDump = (projectName, options) => {
     if (_dbPass === "") {
         _dbPass = getDBPassFromProject(projectName).trim()
     }
@@ -96,6 +99,9 @@ const _initDbDump = (projectName) => {
     if (_dbPodName === "") {
         _dbPodName = `moco-${projectName}-magento-0`
     }
+
+    _fullDump = (typeof options.fullDump !== "undefined")
+    _newDump = (typeof options.newDump !== "undefined")
 }
 
 const _isValidFileAge = (projectName) => {
