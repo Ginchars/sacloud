@@ -19,7 +19,7 @@ const executeCliCommand = async (projectName, options) => {
         const doCli = await yesno({question: `Do you want to execute ${options.command} on ${projectName} [y/yes, n/no]:`})
 
         if (doCli) {
-            console.log(chalk.greenBright(`Executing`), ' ', options.command)
+            console.log(chalk.greenBright(`Executing`), options.command)
             _executeCliCommand(projectName, cronPodName, options.command)
         }
     }
