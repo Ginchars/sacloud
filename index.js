@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 const { program } = require('commander')
 const chalk = require('chalk')
-const { dbpass, createDbDump } = require('./commands/db')
+const { dbpass, createDbDump, dbTunnel } = require('./commands/db')
 const { projectPods, sshProjectPods, getProjectPodInfo } = require('./commands/pods')
 const { executeCliCommand } = require('./commands/mcli')
 
@@ -26,6 +26,13 @@ program
     .combineFlagAndOptionalValue(true)
     .description('Get DB Dump')
     .action(createDbDump);
+
+program
+    .command('db-tunnel')
+    .arguments('<projectName> [port]')
+    .usage(`${chalk.green('<projectName>')} [port]`)
+    .description('Create DB connection tunnel')
+    .action(dbTunnel);
 
 program
     .command('pod-list')

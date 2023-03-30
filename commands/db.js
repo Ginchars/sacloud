@@ -160,8 +160,30 @@ const getDBPassFromProject = (projectName) => {
     return data
 }
 
+/*
+    Create DB Tunnel
+*/
+const dbTunnel = (projectName, port) => {
+    if (typeof projectName === "undefined") {
+        console.log(
+            chalk.red.bold('Missing project name')
+        );
+    } else {
+        let localPort = (typeof port !== "undefined") ? port : 3399
+        let command = `kubectl --kubeconfig ~/.kube/config port-forward -n ${projectName} service/moco-${projectName}-magento-primary ${localPort}:3306`
+
+        console.log(chalk.greenBright(`Creating ${projectName} DB Tunnel.`))
+        console.log(chalk.redBright(`Local port:`), localPort)
+        console.log(chalk.redBright(`DB Pass: `), getDBPassFromProject(projectName))
+        console.log(`Ctrl+C to exit`)
+
+        let data = shell.exec(command, {async: false, silent: true}).stdout
+    }
+}
+
 module.exports = {
     createDbDump,
     dbpass,
-    getDBPassFromProject
+    getDBPassFromProject,
+    dbTunnel
 }
