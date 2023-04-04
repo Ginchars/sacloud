@@ -170,14 +170,14 @@ const dbTunnel = (projectName, port) => {
         );
     } else {
         let localPort = (typeof port !== "undefined") ? port : 3399
-        let command = `kubectl --kubeconfig ~/.kube/config port-forward -n ${projectName} service/moco-${projectName}-magento-primary ${localPort}:3306`
+        let command = `kubectl --kubeconfig ~/.kube/config port-forward --context ${_cluster} -n ${projectName} service/moco-${projectName}-magento-primary ${localPort}:3306`
 
         console.log(chalk.greenBright(`Creating ${projectName} DB Tunnel.`))
         console.log(chalk.redBright(`Local port:`), localPort)
         console.log(chalk.redBright(`DB Pass: `), getDBPassFromProject(projectName))
         console.log(`Ctrl+C to exit`)
-
-        let data = shell.exec(command, {async: false, silent: true}).stdout
+        
+        let data = shell.exec(command);
     }
 }
 
